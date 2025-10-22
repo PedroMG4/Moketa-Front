@@ -25,7 +25,7 @@ export default function Home() {
     }
   }, [])
 
-  // Función para agregar producto al carrito (EXACTAMENTE como el original)
+  // Función para agregar producto al carrito
   const addToCart = (productName, productPrice) => {
     const product = {
       name: productName,
@@ -51,7 +51,7 @@ export default function Home() {
     addToCart(productName, productPrice)
   }
 
-  // Función para mostrar el modal (EXACTAMENTE como el original)
+  // Función para mostrar el modal
   const showCartModalFunction = (productName) => {
     setModalMessage(`Agregaste "${productName}" al carrito`)
     setShowCartModal(true)
@@ -98,7 +98,7 @@ export default function Home() {
   const confirmPromoSelection = () => {
     if (selectedBurgers.length === currentPromo.quantity) {
       // Calcular el precio por hamburguesa (precio total dividido entre cantidad)
-      const pricePerBurger = parseInt(currentPromo.price.replace(/[^0-9]/g, '')) / currentPromo.quantity
+      const pricePerBurger = parseInt(currentPromo.price.replace(/[^\d]/g, '')) / currentPromo.quantity
       const pricePerBurgerFormatted = `$${pricePerBurger.toLocaleString('es-ES').replace(/,/g, '.')}`
       
       // Crear productos para cada hamburguesa seleccionada
@@ -108,191 +108,156 @@ export default function Home() {
         id: Date.now() + Math.random(), // ID único
         isFromPromo: true,
         promoName: currentPromo.name,
-        promoPrice: currentPromo.price,
-        originalPrice: pricePerBurgerFormatted
+        promoPrice: currentPromo.price
       }))
       
-      // Agregar todos los productos al carrito de una vez
+      // Agregar todos los productos al carrito
       const newCart = [...cart, ...newProducts]
       setCart(newCart)
+      
+      // Guardar en localStorage
       localStorage.setItem('moketaCart', JSON.stringify(newCart))
       
+      // Cerrar modal y mostrar confirmación
       setShowPromoModal(false)
-      setCurrentPromo(null)
-      setSelectedBurgers([])
+      setModalMessage(`Agregaste "${currentPromo.name}" al carrito`)
+      setShowCartModal(true)
       
-      // Mostrar modal de confirmación
-      showCartModalFunction(currentPromo.name)
+      // Cerrar modal después de 3 segundos
+      setTimeout(() => {
+        setShowCartModal(false)
+      }, 3000)
+      
+      // Actualizar contador del carrito
+      updateCartCounter(newCart.length)
     }
   }
 
   // Función para cerrar modal de promoción
   const closePromoModal = () => {
     setShowPromoModal(false)
-    setCurrentPromo(null)
     setSelectedBurgers([])
   }
 
   // Lista de hamburguesas disponibles para promociones
-  const availableBurgers = [
-    'Tilin', 'Golosa', 'Pestoketa', 'Cabron', 'Chuchy', 'Pecadora', 
-    'Filosa', 'Macanuda', 'Humita', 'Gaucha', 'Chimuelo', 'Barba Queen'
-  ]
+  const availableBurgers = {
+    'Simple': [
+      'Tilin Simple', 'Golosa Simple', 'Pestoketa Simple', 'Cabron Simple',
+      'Chuchy Simple', 'Pecadora Simple', 'Chimuelo Simple', 'Barba Queen Simple',
+      'Filosa Simple', 'Macanuda Simple', 'Humita Simple', 'Gaucha Simple'
+    ],
+    'Doble': [
+      'Tilin Doble', 'Golosa Doble', 'Pestoketa Doble', 'Cabron Doble',
+      'Chuchy Doble', 'Pecadora Doble', 'Chimuelo Doble', 'Barba Queen Doble',
+      'Filosa Doble', 'Macanuda Doble', 'Humita Doble', 'Gaucha Doble'
+    ]
+  }
 
   return (
     <>
-      <style jsx global>{`
-        /* Variables CSS */
-        :root{
-          /* Colores corporativos del negocio */
-          --violeta: #6A0DAD;
-          --amarillo: #D8B63A;
-          
-          /* Gradientes basados en colores corporativos */
-          --primary: linear-gradient(135deg, #6A0DAD 0%, #8B2BE2 100%);
-          --secondary: linear-gradient(135deg, #D8B63A 0%, #FFD700 100%);
-          --accent: linear-gradient(135deg, #6A0DAD 0%, #D8B63A 100%);
-          --success: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
-          
-          /* Colores sólidos para compatibilidad */
-          --primary-solid: #6A0DAD;
-          --secondary-solid: #D8B63A;
-          --accent-solid: #8B2BE2;
-          --success-solid: #43e97b;
-          
-          /* Neutros modernos */
-          --white: #ffffff;
-          --black: #1a1a1a;
-          --gray-50: #f8fafc;
-          --gray-100: #f1f5f9;
-          --gray-200: #e2e8f0;
-          --gray-300: #cbd5e1;
-          --gray-400: #94a3b8;
-          --gray-500: #64748b;
-          --gray-600: #475569;
-          --gray-700: #334155;
-          --gray-800: #1e293b;
-          --gray-900: #0f172a;
-          
-          /* Sombras modernas */
-          --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-          --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
-          --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-          --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-          --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
-          
-          /* Bordes redondeados */
-          --radius-sm: 0.375rem;
-          --radius: 0.5rem;
-          --radius-md: 0.75rem;
-          --radius-lg: 1rem;
-          --radius-xl: 1.5rem;
-          --radius-2xl: 2rem;
+      <style jsx>{`
+        :root {
+          --primary: #FF6B35;
+          --secondary: #F7931E;
+          --accent: #FFD23F;
+          --dark: #2C3E50;
+          --light: #ECF0F1;
+          --white: #FFFFFF;
+          --gray-100: #F8F9FA;
+          --gray-200: #E9ECEF;
+          --gray-300: #DEE2E6;
+          --gray-400: #CED4DA;
+          --gray-500: #ADB5BD;
+          --gray-600: #6C757D;
+          --gray-700: #495057;
+          --gray-800: #343A40;
+          --gray-900: #212529;
+          --success: #28A745;
+          --danger: #DC3545;
+          --warning: #FFC107;
+          --info: #17A2B8;
+          --radius: 8px;
+          --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+          --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.15);
         }
 
-        /* Reset moderno */
-        *, *::before, *::after {
-          box-sizing: border-box;
+        * {
           margin: 0;
           padding: 0;
-        }
-
-        html {
-          scroll-behavior: smooth;
+          box-sizing: border-box;
         }
 
         body {
-          min-height: 100dvh;
-          display: flex;
-          flex-direction: column;
-          background: linear-gradient(135deg, var(--violeta) 0%, var(--amarillo) 100%);
-          background-attachment: fixed;
-          color: var(--black);
-          font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+          font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
           line-height: 1.6;
-          font-weight: 400;
-          -webkit-font-smoothing: antialiased;
-          -moz-osx-font-smoothing: grayscale;
+          color: var(--gray-800);
+          background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+          min-height: 100vh;
         }
 
-        img {
-          display: block;
-          max-width: 100%;
-          height: auto;
+        .container {
+          max-width: 1200px;
+          margin: 0 auto;
+          padding: 2rem 1rem;
         }
 
-        /* Header moderno con glassmorphism */
         header {
-          background: rgba(255, 255, 255, 0.6);
-          backdrop-filter: blur(20px);
-          -webkit-backdrop-filter: blur(20px);
-          border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-          color: #333;
-          padding: 1rem 1.5rem;
+          background: var(--white);
+          box-shadow: var(--shadow);
           position: sticky;
           top: 0;
-          z-index: 50;
-          box-shadow: var(--shadow-lg);
+          z-index: 100;
         }
 
         .wrap {
           max-width: 1200px;
           margin: 0 auto;
+          padding: 1rem;
           display: flex;
-          align-items: center;
           justify-content: space-between;
-          gap: 1rem;
+          align-items: center;
         }
 
         .brand {
           display: flex;
           align-items: center;
-          gap: 0.75rem;
+          gap: 1rem;
           text-decoration: none;
-          color: inherit;
-          font-weight: 800;
-          font-size: 1.5rem;
-          letter-spacing: -0.025em;
+          color: var(--primary);
+        }
+
+        .name {
+          font-size: 2rem;
+          font-weight: 900;
+          letter-spacing: -0.02em;
         }
 
         .brand__img {
-          width: 2.5rem;
-          height: 2.5rem;
-          object-fit: contain;
+          height: 50px;
+          width: auto;
         }
 
         .cart {
           display: flex;
           align-items: center;
           gap: 0.5rem;
-          padding: 0.75rem 1rem;
+          padding: 0.75rem 1.5rem;
           background: var(--primary);
-          color: white;
+          color: var(--white);
           text-decoration: none;
-          border-radius: var(--radius-lg);
+          border-radius: var(--radius);
           font-weight: 600;
           transition: all 0.2s ease;
-          box-shadow: var(--shadow-md);
         }
 
         .cart:hover {
-          transform: translateY(-1px);
-          box-shadow: var(--shadow-lg);
+          background: var(--secondary);
+          transform: translateY(-2px);
         }
 
         .cart svg {
-          width: 1.25rem;
-          height: 1.25rem;
-        }
-
-        main {
-          flex: 1;
-          padding: 2rem 1.5rem;
-        }
-
-        .container {
-          max-width: 1200px;
-          margin: 0 auto;
+          width: 20px;
+          height: 20px;
         }
 
         .category {
@@ -300,32 +265,31 @@ export default function Home() {
         }
 
         .category__title {
-          font-size: 2rem;
-          font-weight: 800;
+          font-size: 2.5rem;
+          font-weight: 900;
+          color: var(--white);
+          text-align: center;
           margin-bottom: 2rem;
-          color: white;
-          text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+          text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
         }
 
         .grid {
           display: grid;
           grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-          gap: 1.5rem;
+          gap: 2rem;
         }
 
         .card {
-          background: rgba(255, 255, 255, 0.95);
-          border-radius: var(--radius-xl);
+          background: var(--white);
+          border-radius: var(--radius);
           overflow: hidden;
-          box-shadow: var(--shadow-lg);
+          box-shadow: var(--shadow);
           transition: all 0.3s ease;
-          backdrop-filter: blur(10px);
-          border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
         .card:hover {
-          transform: translateY(-4px);
-          box-shadow: var(--shadow-xl);
+          transform: translateY(-5px);
+          box-shadow: var(--shadow-lg);
         }
 
         .card__img {
@@ -339,10 +303,10 @@ export default function Home() {
         }
 
         .card__title {
-          font-size: 1.25rem;
+          font-size: 1.5rem;
           font-weight: 700;
+          color: var(--dark);
           margin-bottom: 0.5rem;
-          color: var(--black);
         }
 
         .card__desc {
@@ -359,9 +323,34 @@ export default function Home() {
         }
 
         .card__price {
+          font-size: 1.25rem;
+          font-weight: 700;
+          color: var(--primary);
+        }
+
+        .btn-add {
+          padding: 0.75rem 1.5rem;
+          background: var(--primary);
+          color: var(--white);
+          border: none;
+          border-radius: var(--radius);
           font-weight: 600;
-          color: var(--primary-solid);
-          font-size: 1.1rem;
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+
+        .btn-add:hover {
+          background: var(--secondary);
+          transform: translateY(-2px);
+        }
+
+        .btn-promo {
+          background: var(--accent);
+          color: var(--dark);
+        }
+
+        .btn-promo:hover {
+          background: var(--secondary);
         }
 
         .add-to-cart-container {
@@ -373,7 +362,7 @@ export default function Home() {
         .add-to-cart-label {
           font-size: 0.875rem;
           color: var(--gray-600);
-          font-weight: 500;
+          text-align: center;
         }
 
         .burger-options {
@@ -381,127 +370,33 @@ export default function Home() {
           gap: 0.5rem;
         }
 
-        .btn-add {
+        .burger-options .btn-add {
           padding: 0.5rem 1rem;
-          background: var(--primary);
-          color: white;
-          border: none;
-          border-radius: var(--radius);
-          font-weight: 600;
-          cursor: pointer;
-          transition: all 0.2s ease;
           font-size: 0.875rem;
         }
 
-        .btn-add:hover {
-          background: var(--accent-solid);
-          transform: translateY(-1px);
-        }
-
-        .btn-promo {
-          background: var(--secondary);
-          color: var(--black);
-        }
-
-        .btn-promo:hover {
-          background: var(--secondary-solid);
-        }
-
-        .social-section {
-          background: rgba(255, 255, 255, 0.1);
-          backdrop-filter: blur(10px);
-          padding: 2rem 1.5rem;
-          margin: 2rem 0;
-          border-radius: var(--radius-xl);
-          text-align: center;
-        }
-
-        .social-title {
-          color: white;
-          font-size: 1.5rem;
-          font-weight: 700;
-          margin-bottom: 1rem;
-        }
-
-        .social-buttons {
-          margin-bottom: 1rem;
-        }
-
-        .social-btn {
-          display: inline-flex;
-          align-items: center;
-          gap: 0.5rem;
-          padding: 0.75rem 1.5rem;
-          background: var(--primary);
-          color: white;
-          text-decoration: none;
-          border-radius: var(--radius-lg);
-          font-weight: 600;
-          transition: all 0.2s ease;
-        }
-
-        .social-btn:hover {
-          background: var(--accent-solid);
-          transform: translateY(-1px);
-        }
-
-        .social-btn svg {
-          width: 1.25rem;
-          height: 1.25rem;
-        }
-
-        .address {
-          color: rgba(255, 255, 255, 0.8);
-          font-size: 0.875rem;
-        }
-
-        footer {
-          background: rgba(0, 0, 0, 0.1);
-          backdrop-filter: blur(10px);
-          padding: 1.5rem;
-          text-align: center;
-          color: white;
-        }
-
-        .footer-credits {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          max-width: 1200px;
-          margin: 0 auto;
-        }
-
-        .devby {
-          font-size: 0.875rem;
-          opacity: 0.8;
-        }
-
+        /* Modal styles */
         .modal {
-          display: none;
           position: fixed;
-          z-index: 1000;
-          left: 0;
           top: 0;
+          left: 0;
           width: 100%;
           height: 100%;
-          background-color: rgba(0, 0, 0, 0.5);
-          backdrop-filter: blur(5px);
-        }
-
-        .modal.show {
+          background: rgba(0, 0, 0, 0.5);
           display: flex;
-          align-items: center;
           justify-content: center;
+          align-items: center;
+          z-index: 1000;
         }
 
         .modal-content {
-          background: white;
-          border-radius: var(--radius-xl);
+          background: var(--white);
           padding: 2rem;
-          max-width: 500px;
+          border-radius: var(--radius);
+          max-width: 400px;
           width: 90%;
+          text-align: center;
           position: relative;
-          box-shadow: var(--shadow-xl);
         }
 
         .close {
@@ -514,11 +409,11 @@ export default function Home() {
         }
 
         .close:hover {
-          color: var(--black);
+          color: var(--gray-700);
         }
 
         .modal-body {
-          text-align: center;
+          padding: 1rem 0;
         }
 
         .modal-icon {
@@ -527,77 +422,87 @@ export default function Home() {
         }
 
         .modal-body h3 {
-          font-size: 1.5rem;
-          font-weight: 700;
-          margin-bottom: 0.5rem;
-          color: var(--black);
+          color: var(--dark);
+          margin-bottom: 1rem;
         }
 
         .modal-body p {
           color: var(--gray-600);
-          margin-bottom: 1.5rem;
         }
 
-        .burger-selection {
+        /* Promo modal styles */
+        .promo-modal-content {
+          background: var(--white);
+          padding: 2rem;
+          border-radius: var(--radius);
+          max-width: 500px;
+          width: 90%;
+          max-height: 80vh;
+          overflow-y: auto;
+          position: relative;
+        }
+
+        .burger-grid {
           display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-          gap: 0.75rem;
-          margin: 1.5rem 0;
+          grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+          gap: 0.5rem;
+          margin: 1rem 0;
         }
 
         .burger-option {
           padding: 0.75rem;
           border: 2px solid var(--gray-200);
           border-radius: var(--radius);
+          text-align: center;
           cursor: pointer;
           transition: all 0.2s ease;
-          text-align: center;
-          font-weight: 600;
+          font-size: 0.875rem;
         }
 
         .burger-option:hover {
-          border-color: var(--primary-solid);
-          background: var(--gray-50);
+          border-color: var(--primary);
+          background: var(--gray-100);
         }
 
         .burger-option.selected {
-          border-color: var(--primary-solid);
+          border-color: var(--primary);
           background: var(--primary);
-          color: white;
+          color: var(--white);
         }
 
         .selected-burgers {
-          margin: 1.5rem 0;
+          margin: 1rem 0;
           padding: 1rem;
-          background: var(--gray-50);
+          background: var(--gray-100);
           border-radius: var(--radius);
         }
 
         .selected-burgers h4 {
           margin-bottom: 0.5rem;
-          color: var(--black);
+          color: var(--dark);
         }
 
         .selected-burgers ul {
           list-style: none;
+          padding: 0;
         }
 
         .selected-burgers li {
           padding: 0.25rem 0;
-          color: var(--gray-700);
+          color: var(--gray-600);
         }
 
         .modal-actions {
           display: flex;
           gap: 1rem;
           justify-content: center;
-          margin-top: 1.5rem;
+          margin-top: 2rem;
         }
 
         .btn-confirm-promo {
           padding: 0.75rem 1.5rem;
-          background: var(--success);
-          color: white;
+          background: var(--primary);
+          color: var(--white);
           border: none;
           border-radius: var(--radius);
           font-weight: 600;
@@ -625,6 +530,94 @@ export default function Home() {
           background: var(--gray-300);
         }
 
+        /* Social section */
+        .social-section {
+          background: var(--dark);
+          color: var(--white);
+          padding: 3rem 0;
+          text-align: center;
+        }
+
+        .social-container {
+          max-width: 1200px;
+          margin: 0 auto;
+          padding: 0 1rem;
+        }
+
+        .social-title {
+          font-size: 2rem;
+          font-weight: 700;
+          margin-bottom: 1rem;
+        }
+
+        .social-buttons {
+          margin-bottom: 2rem;
+        }
+
+        .social-btn {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.5rem;
+          padding: 1rem 2rem;
+          background: var(--primary);
+          color: var(--white);
+          text-decoration: none;
+          border-radius: var(--radius);
+          font-weight: 600;
+          transition: all 0.2s ease;
+        }
+
+        .social-btn:hover {
+          background: var(--secondary);
+          transform: translateY(-2px);
+        }
+
+        .social-btn svg {
+          width: 20px;
+          height: 20px;
+        }
+
+        .address {
+          font-size: 1.1rem;
+          color: var(--gray-300);
+        }
+
+        /* Footer */
+        footer {
+          background: var(--gray-800);
+          color: var(--gray-300);
+          padding: 2rem 0;
+          text-align: center;
+        }
+
+        .footer-credits {
+          max-width: 1200px;
+          margin: 0 auto;
+          padding: 0 1rem;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
+
+        .devby {
+          color: var(--primary);
+          font-weight: 600;
+        }
+
+        /* Loading and error states */
+        .loading-state {
+          text-align: center;
+          padding: 3rem 0;
+        }
+
+        .error-state {
+          text-align: center;
+          padding: 3rem 0;
+          background: rgba(220, 53, 69, 0.1);
+          border-radius: var(--radius);
+          margin: 2rem 0;
+        }
+
         @media (max-width: 768px) {
           .grid {
             grid-template-columns: 1fr;
@@ -642,6 +635,10 @@ export default function Home() {
           .footer-credits {
             flex-direction: column;
             gap: 0.5rem;
+          }
+
+          .modal-actions {
+            flex-direction: column;
           }
         }
       `}</style>
@@ -665,20 +662,26 @@ export default function Home() {
 
       <main>
         <div className="container">
-          {/* Productos dinámicos desde Sanity */}
+          {/* Loading state */}
           {sanityLoading && (
             <section className="category">
-              <h2 className="category__title">Cargando menú...</h2>
-              <p style={{ color: 'white', textAlign: 'center' }}>Cargando productos desde Sanity CMS...</p>
+              <div className="loading-state">
+                <h2 className="category__title">Cargando menú...</h2>
+                <p style={{ color: 'white', textAlign: 'center' }}>Cargando productos desde Sanity CMS...</p>
+              </div>
             </section>
           )}
           
+          {/* Error state */}
           {sanityError && (
             <section className="category">
-              <h2 className="category__title">Error al cargar menú</h2>
-              <p style={{ color: 'white', textAlign: 'center' }}>
-                Error: {sanityError}. Mostrando menú estático...
-              </p>
+              <div className="error-state">
+                <h2 className="category__title">Error al cargar menú</h2>
+                <p style={{ color: 'white', textAlign: 'center' }}>
+                  Error: {sanityError}
+                </p>
+                <p style={{ color: 'white', textAlign: IPython.embed() }}>Por favor, inténtalo de nuevo más tarde.</p>
+              </div>
             </section>
           )}
           
@@ -732,533 +735,17 @@ export default function Home() {
             </>
           )}
 
-          {/* Hamburguesas (fallback estático) */}
-          <section className="category">
-            <h2 className="category__title">Hamburguesas</h2>
-            <div className="grid">
-              <article className="card">
-                <img className="card__img" src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=800&h=600&fit=crop" alt="Hamburguesa Copetuda" />
-                <div className="card__body">
-                  <h3 className="card__title">Copetuda</h3>
-                  <p className="card__desc">Pan, mayonesa, lechuga, tomate, carne, queso tybo x2, huevo, jamón</p>
-                  <div className="card__row">
-                    <div className="card__price">Simple: $7.000 | Doble: $10.000</div>
-                    <div className="add-to-cart-container">
-                      <span className="add-to-cart-label">Agregar al carrito</span>
-                      <div className="burger-options">
-                        <button className="btn-add" onClick={() => addToCart('Copetuda Simple', '$7.000')}>Simple</button>
-                        <button className="btn-add" onClick={() => addToCart('Copetuda Doble', '$10.000')}>Doble</button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </article>
-
-              <article className="card">
-                <img className="card__img" src="https://images.unsplash.com/photo-1571091718767-18b5b1457add?w=800&h=600&fit=crop" alt="Hamburguesa Koketa" />
-                <div className="card__body">
-                  <h3 className="card__title">Koketa</h3>
-                  <p className="card__desc">Pan, salsa moketa, carne, huevo, panceta, cebolla caramelizada, queso tybo, queso cheddar</p>
-                  <div className="card__row">
-                    <div className="card__price">Simple: $7.000 | Doble: $10.000</div>
-                    <div className="add-to-cart-container">
-                      <span className="add-to-cart-label">Agregar al carrito</span>
-                      <div className="burger-options">
-                        <button className="btn-add" onClick={() => addToCart('Koketa Simple', '$7.000')}>Simple</button>
-                        <button className="btn-add" onClick={() => addToCart('Koketa Doble', '$10.000')}>Doble</button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </article>
-
-              <article className="card">
-                <img className="card__img" src="https://images.unsplash.com/photo-1553979459-d2229ba7433a?w=800&h=600&fit=crop" alt="Hamburguesa Tilin" />
-                <div className="card__body">
-                  <h3 className="card__title">Tilin</h3>
-                  <p className="card__desc">Pan, salsa moketa, carne, queso cheddar x2, chimichurri</p>
-                  <div className="card__row">
-                    <div className="card__price">Simple: $5.000 | Doble: $8.000</div>
-                    <div className="add-to-cart-container">
-                      <span className="add-to-cart-label">Agregar al carrito</span>
-                      <div className="burger-options">
-                        <button className="btn-add" onClick={() => addToCart('Tilin Simple', '$5.000')}>Simple</button>
-                        <button className="btn-add" onClick={() => addToCart('Tilin Doble', '$8.000')}>Doble</button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </article>
-
-              <article className="card">
-                <img className="card__img" src="https://images.unsplash.com/photo-1571091655789-405eb7a3a3a8?w=800&h=600&fit=crop" alt="Hamburguesa Golosa" />
-                <div className="card__body">
-                  <h3 className="card__title">Golosa</h3>
-                  <p className="card__desc">Pan, mayonesa, tomate, carne, queso cheddar x2, pepinos</p>
-                  <div className="card__row">
-                    <div className="card__price">Simple: $5.000 | Doble: $8.000</div>
-                    <div className="add-to-cart-container">
-                      <span className="add-to-cart-label">Agregar al carrito</span>
-                      <div className="burger-options">
-                        <button className="btn-add" onClick={() => addToCart('Golosa Simple', '$5.000')}>Simple</button>
-                        <button className="btn-add" onClick={() => addToCart('Golosa Doble', '$8.000')}>Doble</button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </article>
-
-              <article className="card">
-                <img className="card__img" src="https://images.unsplash.com/photo-1572802419224-296b0aeee0d9?w=800&h=600&fit=crop" alt="Hamburguesa Chuchy" />
-                <div className="card__body">
-                  <h3 className="card__title">Chuchy</h3>
-                  <p className="card__desc">Pan, mayonesa, carne, queso cheddar x2</p>
-                  <div className="card__row">
-                    <div className="card__price">Simple: $5.000 | Doble: $8.000</div>
-                    <div className="add-to-cart-container">
-                      <span className="add-to-cart-label">Agregar al carrito</span>
-                      <div className="burger-options">
-                        <button className="btn-add" onClick={() => addToCart('Chuchy Simple', '$5.000')}>Simple</button>
-                        <button className="btn-add" onClick={() => addToCart('Chuchy Doble', '$8.000')}>Doble</button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </article>
-
-              <article className="card">
-                <img className="card__img" src="https://images.unsplash.com/photo-1525059696034-4967a729002e?w=800&h=600&fit=crop" alt="Hamburguesa Pecadora" />
-                <div className="card__body">
-                  <h3 className="card__title">Pecadora</h3>
-                  <p className="card__desc">Pan, salsa moketa, lechuga, tomate, carne, queso cheddar x2, panceta</p>
-                  <div className="card__row">
-                    <div className="card__price">Simple: $5.000 | Doble: $8.000</div>
-                    <div className="add-to-cart-container">
-                      <span className="add-to-cart-label">Agregar al carrito</span>
-                      <div className="burger-options">
-                        <button className="btn-add" onClick={() => addToCart('Pecadora Simple', '$5.000')}>Simple</button>
-                        <button className="btn-add" onClick={() => addToCart('Pecadora Doble', '$8.000')}>Doble</button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </article>
-
-              <article className="card">
-                <img className="card__img" src="https://images.unsplash.com/photo-1550547660-d9450f859349?w=800&h=600&fit=crop" alt="Hamburguesa Chimuelo" />
-                <div className="card__body">
-                  <h3 className="card__title">Chimuelo</h3>
-                  <p className="card__desc">Pan, mayonesa, carne, queso tybo x2</p>
-                  <div className="card__row">
-                    <div className="card__price">Simple: $5.000 | Doble: $8.000</div>
-                    <div className="add-to-cart-container">
-                      <span className="add-to-cart-label">Agregar al carrito</span>
-                      <div className="burger-options">
-                        <button className="btn-add" onClick={() => addToCart('Chimuelo Simple', '$5.000')}>Simple</button>
-                        <button className="btn-add" onClick={() => addToCart('Chimuelo Doble', '$8.000')}>Doble</button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </article>
-
-              <article className="card">
-                <img className="card__img" src="https://images.unsplash.com/photo-1571091655789-405eb7a3a3a8?w=800&h=600&fit=crop" alt="Hamburguesa Barba Queen" />
-                <div className="card__body">
-                  <h3 className="card__title">Barba Queen</h3>
-                  <p className="card__desc">Pan, mayonesa, carne, queso cheddar x2, salsa barbacoa</p>
-                  <div className="card__row">
-                    <div className="card__price">Simple: $5.000 | Doble: $8.000</div>
-                    <div className="add-to-cart-container">
-                      <span className="add-to-cart-label">Agregar al carrito</span>
-                      <div className="burger-options">
-                        <button className="btn-add" onClick={() => addToCart('Barba Queen Simple', '$5.000')}>Simple</button>
-                        <button className="btn-add" onClick={() => addToCart('Barba Queen Doble', '$8.000')}>Doble</button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </article>
-
-              <article className="card">
-                <img className="card__img" src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=800&h=600&fit=crop" alt="Hamburguesa Pestoketa" />
-                <div className="card__body">
-                  <h3 className="card__title">Pestoketa</h3>
-                  <p className="card__desc">Pan, salsa moketa, tomate, carne, queso cheddar x2, pesto</p>
-                  <div className="card__row">
-                    <div className="card__price">Simple: $5.000 | Doble: $8.000</div>
-                    <div className="add-to-cart-container">
-                      <span className="add-to-cart-label">Agregar al carrito</span>
-                      <div className="burger-options">
-                        <button className="btn-add" onClick={() => addToCart('Pestoketa Simple', '$5.000')}>Simple</button>
-                        <button className="btn-add" onClick={() => addToCart('Pestoketa Doble', '$8.000')}>Doble</button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </article>
-
-              <article className="card">
-                <img className="card__img" src="https://images.unsplash.com/photo-1571091718767-18b5b1457add?w=800&h=600&fit=crop" alt="Hamburguesa Cabron" />
-                <div className="card__body">
-                  <h3 className="card__title">Cabron</h3>
-                  <p className="card__desc">Pan, mayonesa, carne, queso cheddar x2, panceta, huevo</p>
-                  <div className="card__row">
-                    <div className="card__price">Simple: $5.000 | Doble: $8.000</div>
-                    <div className="add-to-cart-container">
-                      <span className="add-to-cart-label">Agregar al carrito</span>
-                      <div className="burger-options">
-                        <button className="btn-add" onClick={() => addToCart('Cabron Simple', '$5.000')}>Simple</button>
-                        <button className="btn-add" onClick={() => addToCart('Cabron Doble', '$8.000')}>Doble</button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </article>
-
-              <article className="card">
-                <img className="card__img" src="https://images.unsplash.com/photo-1553979459-d2229ba7433a?w=800&h=600&fit=crop" alt="Hamburguesa Filosa" />
-                <div className="card__body">
-                  <h3 className="card__title">Filosa</h3>
-                  <p className="card__desc">Pan, salsa moketa, carne, queso cheddar x2, chimichurri, cebolla caramelizada, panceta</p>
-                  <div className="card__row">
-                    <div className="card__price">Simple: $5.000 | Doble: $8.000</div>
-                    <div className="add-to-cart-container">
-                      <span className="add-to-cart-label">Agregar al carrito</span>
-                      <div className="burger-options">
-                        <button className="btn-add" onClick={() => addToCart('Filosa Simple', '$5.000')}>Simple</button>
-                        <button className="btn-add" onClick={() => addToCart('Filosa Doble', '$8.000')}>Doble</button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </article>
-
-              <article className="card">
-                <img className="card__img" src="https://images.unsplash.com/photo-1571091655789-405eb7a3a3a8?w=800&h=600&fit=crop" alt="Hamburguesa Macanuda" />
-                <div className="card__body">
-                  <h3 className="card__title">Macanuda</h3>
-                  <p className="card__desc">Pan, mayonesa, carne, queso cheddar x2, cebolla caramelizada</p>
-                  <div className="card__row">
-                    <div className="card__price">Simple: $5.000 | Doble: $8.000</div>
-                    <div className="add-to-cart-container">
-                      <span className="add-to-cart-label">Agregar al carrito</span>
-                      <div className="burger-options">
-                        <button className="btn-add" onClick={() => addToCart('Macanuda Simple', '$5.000')}>Simple</button>
-                        <button className="btn-add" onClick={() => addToCart('Macanuda Doble', '$8.000')}>Doble</button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </article>
-
-              <article className="card">
-                <img className="card__img" src="https://images.unsplash.com/photo-1572802419224-296b0aeee0d9?w=800&h=600&fit=crop" alt="Hamburguesa Humita" />
-                <div className="card__body">
-                  <h3 className="card__title">Humita</h3>
-                  <p className="card__desc">Pan, salsa red, tomate, carne, queso tybo x2, choclo cremoso</p>
-                  <div className="card__row">
-                    <div className="card__price">Simple: $5.000 | Doble: $8.000</div>
-                    <div className="add-to-cart-container">
-                      <span className="add-to-cart-label">Agregar al carrito</span>
-                      <div className="burger-options">
-                        <button className="btn-add" onClick={() => addToCart('Humita Simple', '$5.000')}>Simple</button>
-                        <button className="btn-add" onClick={() => addToCart('Humita Doble', '$8.000')}>Doble</button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </article>
-
-              <article className="card">
-                <img className="card__img" src="https://images.unsplash.com/photo-1525059696034-4967a729002e?w=800&h=600&fit=crop" alt="Hamburguesa Gaucha" />
-                <div className="card__body">
-                  <h3 className="card__title">Gaucha</h3>
-                  <p className="card__desc">Pan, salsa red, carne, queso tybo x2, salsa criolla</p>
-                  <div className="card__row">
-                    <div className="card__price">Simple: $5.000 | Doble: $8.000</div>
-                    <div className="add-to-cart-container">
-                      <span className="add-to-cart-label">Agregar al carrito</span>
-                      <div className="burger-options">
-                        <button className="btn-add" onClick={() => addToCart('Gaucha Simple', '$5.000')}>Simple</button>
-                        <button className="btn-add" onClick={() => addToCart('Gaucha Doble', '$8.000')}>Doble</button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </article>
-            </div>
-          </section>
-
-          {/* Promos */}
-          <section className="category">
-            <h2 className="category__title">Promos</h2>
-            <div className="grid">
-              <article className="card">
-                <img className="card__img" src="https://images.unsplash.com/photo-1604382354936-07c5d9983bd3?w=800&h=600&fit=crop" alt="2 Pizzas Muzarella" />
-                <div className="card__body">
-                  <h3 className="card__title">2 Pizzas Muzarella</h3>
-                  <p className="card__desc">Prepizza casera, salsa casera, muzarella, aceitunas</p>
-                  <div className="card__row">
-                    <div className="card__price">$ 10.000</div>
-                    <button className="btn-add" onClick={() => addToCart('2 Pizzas Muzarella', '$ 10.000')}>Agregar al carrito</button>
-                  </div>
-                </div>
-              </article>
-
-              <article className="card">
-                <img className="card__img" src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=800&h=600&fit=crop" alt="2 Hamburguesas Simples" />
-                <div className="card__body">
-                  <h3 className="card__title">2 Hamburguesas Simples</h3>
-                  <p className="card__desc">Tilin, golosa, pestoketa, cabron, chuchy, pecadora, filosa, macanuda, humita, gaucha, chimuelo, barba queen</p>
-                  <div className="card__row">
-                    <div className="card__price">$ 8.000</div>
-                    <button className="btn-add btn-promo" onClick={() => openPromoModal('2 Hamburguesas Simples', '$8.000', 'Simple', 2)}>Agregar al carrito</button>
-                  </div>
-                </div>
-              </article>
-
-              <article className="card">
-                <img className="card__img" src="https://images.unsplash.com/photo-1571091718767-18b5b1457add?w=800&h=600&fit=crop" alt="2 Hamburguesas Dobles" />
-                <div className="card__body">
-                  <h3 className="card__title">2 Hamburguesas Dobles</h3>
-                  <p className="card__desc">Tilin, golosa, pestoketa, cabron, chuchy, pecadora, filosa, macanuda, humita, gaucha, chimuelo, barba queen</p>
-                  <div className="card__row">
-                    <div className="card__price">$ 14.000</div>
-                    <button className="btn-add btn-promo" onClick={() => openPromoModal('2 Hamburguesas Dobles', '$14.000', 'Doble', 2)}>Agregar al carrito</button>
-                  </div>
-                </div>
-              </article>
-            </div>
-          </section>
-
-          {/* Pizzas */}
-          <section className="category">
-            <h2 className="category__title">Pizzas</h2>
-            <div className="grid">
-              <article className="card">
-                <img className="card__img" src="https://images.unsplash.com/photo-1604382354936-07c5d9983bd3?w=800&h=600&fit=crop" alt="Pizza Muzarella" />
-                <div className="card__body">
-                  <h3 className="card__title">Muzarella</h3>
-                  <p className="card__desc">Prepizza casera, salsa casera, muzarella, aceitunas</p>
-                  <div className="card__row">
-                    <div className="card__price">$ 7.000</div>
-                    <button className="btn-add" onClick={() => addToCart('Muzarella', '$ 7.000')}>Agregar al carrito</button>
-                  </div>
-                </div>
-              </article>
-
-              <article className="card">
-                <img className="card__img" src="https://images.unsplash.com/photo-1513104890138-7c749659a591?w=800&h=600&fit=crop" alt="Pizza Jamón y Morrones" />
-                <div className="card__body">
-                  <h3 className="card__title">Jamón y Morrones</h3>
-                  <p className="card__desc">Prepizza casera, salsa casera, jamón, muzarella, morrones, aceitunas</p>
-                  <div className="card__row">
-                    <div className="card__price">$ 10.000</div>
-                    <button className="btn-add" onClick={() => addToCart('Jamón y Morrones', '$ 10.000')}>Agregar al carrito</button>
-                  </div>
-                </div>
-              </article>
-
-              <article className="card">
-                <img className="card__img" src="https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=800&h=600&fit=crop" alt="Pizza Calabresa" />
-                <div className="card__body">
-                  <h3 className="card__title">Calabresa</h3>
-                  <p className="card__desc">Prepizza casera, salsa casera, muzarella, salame, aceitunas</p>
-                  <div className="card__row">
-                    <div className="card__price">$ 10.000</div>
-                    <button className="btn-add" onClick={() => addToCart('Calabresa', '$ 10.000')}>Agregar al carrito</button>
-                  </div>
-                </div>
-              </article>
-
-              <article className="card">
-                <img className="card__img" src="https://images.unsplash.com/photo-1628840042765-356cda07504e?w=800&h=600&fit=crop" alt="Pizza Fugazzeta" />
-                <div className="card__body">
-                  <h3 className="card__title">Fugazzeta</h3>
-                  <p className="card__desc">Prepizza casera, salsa casera, cebolla asada, muzarella, aceitunas</p>
-                  <div className="card__row">
-                    <div className="card__price">$ 10.000</div>
-                    <button className="btn-add" onClick={() => addToCart('Fugazzeta', '$ 10.000')}>Agregar al carrito</button>
-                  </div>
-                </div>
-              </article>
-
-              <article className="card">
-                <img className="card__img" src="https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=800&h=600&fit=crop" alt="Pizza A Caballo" />
-                <div className="card__body">
-                  <h3 className="card__title">A Caballo</h3>
-                  <p className="card__desc">Prepizza casera, salsa casera, muzarella, huevos fritos x4, aceitunas</p>
-                  <div className="card__row">
-                    <div className="card__price">$ 10.000</div>
-                    <button className="btn-add" onClick={() => addToCart('A Caballo', '$ 10.000')}>Agregar al carrito</button>
-                  </div>
-                </div>
-              </article>
-            </div>
-          </section>
-
-          {/* Milanesas */}
-          <section className="category">
-            <h2 className="category__title">Milanesas (para 4 personas, pican 6, todas vienen con papas fritas)</h2>
-            <div className="grid">
-              <article className="card">
-                <img className="card__img" src="https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=800&h=600&fit=crop" alt="Milanesa con Papas" />
-                <div className="card__body">
-                  <h3 className="card__title">Milanesa con Papas</h3>
-                  <p className="card__desc">Milanesa de ternera, papas fritas, limones, salsa moketa</p>
-                  <div className="card__row">
-                    <div className="card__price">$ 15.000</div>
-                    <button className="btn-add" onClick={() => addToCart('Milanesa con Papas', '$ 15.000')}>Agregar al carrito</button>
-                  </div>
-                </div>
-              </article>
-
-              <article className="card">
-                <img className="card__img" src="https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=800&h=600&fit=crop" alt="Mila Napo" />
-                <div className="card__body">
-                  <h3 className="card__title">Mila Napo</h3>
-                  <p className="card__desc">Milanesa de ternera, jamón, muzarella, morrones, aceituna, papas fritas, salsa moketa</p>
-                  <div className="card__row">
-                    <div className="card__price">$ 20.000</div>
-                    <button className="btn-add" onClick={() => addToCart('Mila Napo', '$ 20.000')}>Agregar al carrito</button>
-                  </div>
-                </div>
-              </article>
-
-              <article className="card">
-                <img className="card__img" src="https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=800&h=600&fit=crop" alt="Mila a Caballo" />
-                <div className="card__body">
-                  <h3 className="card__title">Mila a Caballo</h3>
-                  <p className="card__desc">Milanesa de ternera, huevos fritos x4, papas fritas, salsa moketa</p>
-                  <div className="card__row">
-                    <div className="card__price">$ 18.000</div>
-                    <button className="btn-add" onClick={() => addToCart('Mila a Caballo', '$ 18.000')}>Agregar al carrito</button>
-                  </div>
-                </div>
-              </article>
-
-              <article className="card">
-                <img className="card__img" src="https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=800&h=600&fit=crop" alt="Mila Fugazzeta" />
-                <div className="card__body">
-                  <h3 className="card__title">Mila Fugazzeta</h3>
-                  <p className="card__desc">Milanesa de ternera, cebolla caramelizada, muzarella, papas fritas, salsa moketa</p>
-                  <div className="card__row">
-                    <div className="card__price">$ 18.000</div>
-                    <button className="btn-add" onClick={() => addToCart('Mila Fugazzeta', '$ 18.000')}>Agregar al carrito</button>
-                  </div>
-                </div>
-              </article>
-            </div>
-          </section>
-
-          {/* Papas Fritas */}
-          <section className="category">
-            <h2 className="category__title">Papas Fritas</h2>
-            <div className="grid">
-              <article className="card">
-                <img className="card__img" src="https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=800&h=600&fit=crop" alt="Papas Fritas" />
-                <div className="card__body">
-                  <h3 className="card__title">Papas Fritas</h3>
-                  <p className="card__desc">Papas fritas, ketchup, salsa moketa</p>
-                  <div className="card__row">
-                    <div className="card__price">$ 6.000</div>
-                    <button className="btn-add" onClick={() => addToCart('Papas Fritas', '$ 6.000')}>Agregar al carrito</button>
-                  </div>
-                </div>
-              </article>
-
-              <article className="card">
-                <img className="card__img" src="https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=800&h=600&fit=crop" alt="Salchi Papas" />
-                <div className="card__body">
-                  <h3 className="card__title">Salchi Papas</h3>
-                  <p className="card__desc">Papas fritas, cheddar, salchichas fritas, salsa moketa</p>
-                  <div className="card__row">
-                    <div className="card__price">$ 8.000</div>
-                    <button className="btn-add" onClick={() => addToCart('Salchi Papas', '$ 8.000')}>Agregar al carrito</button>
-                  </div>
-                </div>
-              </article>
-
-              <article className="card">
-                <img className="card__img" src="https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=800&h=600&fit=crop" alt="Papas Doble Sol" />
-                <div className="card__body">
-                  <h3 className="card__title">Papas Doble Sol</h3>
-                  <p className="card__desc">Papas fritas, 2 huevos</p>
-                  <div className="card__row">
-                    <div className="card__price">$ 8.000</div>
-                    <button className="btn-add" onClick={() => addToCart('Papas Doble Sol', '$ 8.000')}>Agregar al carrito</button>
-                  </div>
-                </div>
-              </article>
-
-              <article className="card">
-                <img className="card__img" src="https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=800&h=600&fit=crop" alt="Papas Bravas" />
-                <div className="card__body">
-                  <h3 className="card__title">Papas Bravas</h3>
-                  <p className="card__desc">Papas fritas, cheddar, panceta</p>
-                  <div className="card__row">
-                    <div className="card__price">$ 8.000</div>
-                    <button className="btn-add" onClick={() => addToCart('Papas Bravas', '$ 8.000')}>Agregar al carrito</button>
-                  </div>
-                </div>
-              </article>
-
-              <article className="card">
-                <img className="card__img" src="https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=800&h=600&fit=crop" alt="Papas Jam" />
-                <div className="card__body">
-                  <h3 className="card__title">Papas Jam</h3>
-                  <p className="card__desc">Papas fritas, cheddar, jamon, queso, salsa moketa</p>
-                  <div className="card__row">
-                    <div className="card__price">$ 8.000</div>
-                    <button className="btn-add" onClick={() => addToCart('Papas Jam', '$ 8.000')}>Agregar al carrito</button>
-                  </div>
-                </div>
-              </article>
-            </div>
-          </section>
-
-          {/* Sandwiches */}
-          <section className="category">
-            <h2 className="category__title">Sandwiches (todos vienen con papas fritas)</h2>
-            <div className="grid">
-              <article className="card">
-                <img className="card__img" src="https://images.unsplash.com/photo-1551782450-a2132b4ba21d?w=800&h=600&fit=crop" alt="Sandwich de Milanesa Simple" />
-                <div className="card__body">
-                  <h3 className="card__title">Sandwich de Milanesa Simple</h3>
-                  <p className="card__desc">Pan, salsa moketa, lechuga, tomate, milanesas</p>
-                  <div className="card__row">
-                    <div className="card__price">$ 7.000</div>
-                    <button className="btn-add" onClick={() => addToCart('Sandwich de Milanesa Simple', '$ 7.000')}>Agregar al carrito</button>
-                  </div>
-                </div>
-              </article>
-
-              <article className="card">
-                <img className="card__img" src="https://images.unsplash.com/photo-1551782450-a2132b4ba21d?w=800&h=600&fit=crop" alt="Sandwich de Milanesa Completo" />
-                <div className="card__body">
-                  <h3 className="card__title">Sandwich de Milanesa Completo</h3>
-                  <p className="card__desc">Pan, salsa moketa, lechuga, tomate, milanesas, queso tybo, jamón, huevo x3</p>
-                  <div className="card__row">
-                    <div className="card__price">$ 10.000</div>
-                    <button className="btn-add" onClick={() => addToCart('Sandwich de Milanesa Completo', '$ 10.000')}>Agregar al carrito</button>
-                  </div>
-                </div>
-              </article>
-
-              <article className="card">
-                <img className="card__img" src="https://images.unsplash.com/photo-1551782450-a2132b4ba21d?w=800&h=600&fit=crop" alt="Lomito Moketa" />
-                <div className="card__body">
-                  <h3 className="card__title">Lomito Moketa</h3>
-                  <p className="card__desc">Pan, salsa moketa, lechuga, tomate, lomito ternera, queso tybo x4, jamón x2, huevo x2</p>
-                  <div className="card__row">
-                    <div className="card__price">$ 10.000</div>
-                    <button className="btn-add" onClick={() => addToCart('Lomito Moketa', '$ 10.000')}>Agregar al carrito</button>
-                  </div>
-                </div>
-              </article>
-            </div>
-          </section>
+          {/* Empty state */}
+          {!sanityLoading && !sanityError && products.length === 0 && (
+            <section className="category">
+              <div className="loading-state">
+                <h2 className="category__title">No hay productos disponibles</h2>
+                <p style={{ color: 'white', textAlign: 'center' }}>
+                  Por favor, agrega productos desde Sanity Studio.
+                </p>
+              </div>
+            </section>
+          )}
         </div>
       </main>
 
@@ -1299,40 +786,45 @@ export default function Home() {
         </div>
       )}
 
-      {/* Modal de selección de promociones */}
+      {/* Modal de selección de promoción */}
       {showPromoModal && currentPromo && (
         <div className="modal show" onClick={closePromoModal}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+          <div className="promo-modal-content" onClick={(e) => e.stopPropagation()}>
             <span className="close" onClick={closePromoModal}>&times;</span>
             <div className="modal-body">
-              <h3>Selecciona tus hamburguesas</h3>
-              <p>Elige {currentPromo.quantity} hamburguesas {currentPromo.burgerType.toLowerCase()}s</p>
-              <div className="burger-selection">
-                {availableBurgers.map((burger) => (
-                  <div 
-                    key={burger}
-                    className={`burger-option ${selectedBurgers.includes(burger) ? 'selected' : ''}`}
-                    onClick={() => selectBurger(burger)}
+              <h3>Selecciona {currentPromo.quantity} hamburguesa(s) {currentPromo.burgerType.toLowerCase()}(s)</h3>
+              <p>Precio total: {currentPromo.price}</p>
+              
+              <div className="burger-grid">
+                {availableBurgers[currentPromo.burgerType]?.map(burgerName => (
+                  <div
+                    key={burgerName}
+                    className={`burger-option ${selectedBurgers.includes(burgerName) ? 'selected' : ''}`}
+                    onClick={() => selectBurger(burgerName)}
                   >
-                    {burger}
+                    {burgerName}
                   </div>
                 ))}
               </div>
-              <div className="selected-burgers">
-                <h4>Hamburguesas seleccionadas:</h4>
-                <ul>
-                  {selectedBurgers.map((burger, index) => (
-                    <li key={index}>{burger}</li>
-                  ))}
-                </ul>
-              </div>
+              
+              {selectedBurgers.length > 0 && (
+                <div className="selected-burgers">
+                  <h4>Hamburguesas seleccionadas:</h4>
+                  <ul>
+                    {selectedBurgers.map((burger, index) => (
+                      <li key={index}>{burger}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              
               <div className="modal-actions">
                 <button 
-                  className="btn-confirm-promo"
+                  className="btn-confirm-promo" 
                   onClick={confirmPromoSelection}
                   disabled={selectedBurgers.length !== currentPromo.quantity}
                 >
-                  Confirmar Promoción
+                  Confirmar ({selectedBurgers.length}/{currentPromo.quantity})
                 </button>
                 <button className="btn-cancel" onClick={closePromoModal}>
                   Cancelar
