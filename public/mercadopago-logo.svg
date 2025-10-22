@@ -1,0 +1,10 @@
+<!-- 
+Para usar un logo local:
+1. Descarga el logo oficial de Mercado Pago desde: https://www.mercadopago.com.ar/developers/es/docs/checkout-bricks/visual-customization
+2. Guárdalo como mercadopago-logo.svg en esta carpeta
+3. Cambia la línea en checkout.html de:
+   <img src="https://http2.mlstatic.com/storage/logos-api-admin/a5f047d0-9be0-11ec-aad4-c1681f103a3a-m.svg" alt="Mercado Pago" class="payment-icon mercado-pago-logo">
+   a:
+   <img src="mercadopago-logo.svg" alt="Mercado Pago" class="payment-icon mercado-pago-logo">
+-->
+
