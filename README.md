@@ -1,36 +1,55 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# MOKETA - Frontend
 
-## Getting Started
+Sitio web de MOKETA con diseño original restaurado y integración con Sanity CMS.
 
-First, run the development server:
+## 🚀 Deploy en Vercel
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+### 1. Variables de Entorno
+
+Configura estas variables en Vercel:
+
+```
+NEXT_PUBLIC_SANITY_PROJECT_ID=tu_project_id_de_sanity
+NEXT_PUBLIC_SANITY_DATASET=production
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Deploy
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+1. Conecta tu repositorio a Vercel
+2. Selecciona el directorio `frontend` como root
+3. Vercel detectará automáticamente que es un proyecto Next.js
+4. Agrega las variables de entorno en la configuración
+5. Deploy!
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 3. Sanity Studio
 
-## Learn More
+Para gestionar el contenido:
 
-To learn more about Next.js, take a look at the following resources:
+1. Ve a tu proyecto de Sanity
+2. Agrega productos y promociones
+3. Los cambios se reflejarán automáticamente en el sitio
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🎨 Diseño
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- **Colores corporativos**: Violeta (#6A0DAD) y Amarillo (#D8B63A)
+- **Glassmorphism**: Efectos de transparencia y blur
+- **Gradientes**: Botones con efectos corporativos
+- **Responsive**: Adaptado para móviles y desktop
 
-## Deploy on Vercel
+## 📱 Funcionalidades
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- ✅ Carrito de compras con localStorage
+- ✅ Productos desde Sanity CMS
+- ✅ Promociones dinámicas
+- ✅ Diseño original del FrontendViejo
+- ✅ Efectos hover y transiciones
+- ✅ Modal de confirmación
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 🛠️ Desarrollo Local
+
+```bash
+npm install
+npm run dev
+```
+
+El sitio estará disponible en `http://localhost:3000`

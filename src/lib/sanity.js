@@ -35,4 +35,5 @@ export const getPromotionBySlug = async (slug) => {
   return await client.fetch(query, { slug })
 }
 
+export { client }
 export default client

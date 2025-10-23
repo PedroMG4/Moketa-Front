@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import client, { urlFor } from '../lib/sanity'
+import { client, urlFor } from '../lib/sanity'
 
 export function useSanityData() {
   const [products, setProducts] = useState([])
