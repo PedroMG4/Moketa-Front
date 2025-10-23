@@ -1,10 +1,7 @@
-'use client'
-
 import { useState, useEffect } from 'react'
-import { getProducts, getPromotions, urlFor } from '../lib/sanity'
-import { mockProducts, mockPromotions } from '../lib/mockData'
+import client, { urlFor } from '../lib/sanity'
 
-export const useSanityData = () => {
+export function useSanityData() {
   const [products, setProducts] = useState([])
   const [promotions, setPromotions] = useState([])
   const [loading, setLoading] = useState(true)
@@ -14,57 +11,59 @@ export const useSanityData = () => {
     const fetchData = async () => {
       try {
         setLoading(true)
+        setError(null)
+
+        // Fetch products
+        const productsQuery = `*[_type == "product"] | order(_createdAt desc) {
+          _id,
+          name,
+          description,
+          price,
+          image,
+          category,
+          options,
+          variant
+        }`
         
-        // Check if we have valid Sanity configuration
-        const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID
-        if (!projectId || projectId === 'your_project_id') {
-          console.log('Sanity not configured, using mock data')
-          setProducts(mockProducts)
-          setPromotions(mockPromotions)
-          setError(null)
-          setLoading(false)
-          return
-        }
+        const productsData = await client.fetch(productsQuery)
         
-        // Try to fetch from Sanity API
-        try {
-          console.log('Fetching data from Sanity API...')
-          const [productsData, promotionsData] = await Promise.all([
-            getProducts(),
-            getPromotions()
-          ])
+        // Process products data
+        const processedProducts = productsData.map(product => ({
+          ...product,
+          displayPrice: product.price,
+          imageUrl: product.image ? urlFor(product.image).width(400).height(300).url() : null,
+          variant: product.category === 'burgers' ? true : false
+        }))
+        
+        setProducts(processedProducts)
 
-          console.log('Products fetched:', productsData.length)
-          console.log('Promotions fetched:', promotionsData.length)
+        // Fetch promotions
+        const promotionsQuery = `*[_type == "promotion"] | order(_createdAt desc) {
+          _id,
+          name,
+          description,
+          price,
+          image,
+          burgerType,
+          quantity
+        }`
+        
+        const promotionsData = await client.fetch(promotionsQuery)
+        
+        // Process promotions data
+        const processedPromotions = promotionsData.map(promotion => ({
+          ...promotion,
+          displayPrice: promotion.price,
+          imageUrl: promotion.image ? urlFor(promotion.image).width(400).height(300).url() : null,
+          productType: promotion.burgerType || 'Simple',
+          quantity: promotion.quantity || 2
+        }))
+        
+        setPromotions(processedPromotions)
 
-          // Process products data
-          const processedProducts = productsData.map(product => ({
-            ...product,
-            imageUrl: product.image ? urlFor(product.image).width(800).height(600).url() : null,
-            displayPrice: `$${product.price.toLocaleString('es-ES').replace(/,/g, '.')}`
-          }))
-
-          // Process promotions data
-          const processedPromotions = promotionsData.map(promotion => ({
-            ...promotion,
-            imageUrl: promotion.image ? urlFor(promotion.image).width(800).height(600).url() : null,
-            displayPrice: `$${promotion.price.toLocaleString('es-ES').replace(/,/g, '.')}`
-          }))
-
-          setProducts(processedProducts)
-          setPromotions(processedPromotions)
-          setError(null)
-        } catch (apiError) {
-          console.error('Error fetching from Sanity API:', apiError)
-          setError(`Error al conectar con Sanity CMS: ${apiError.message}`)
-          setProducts([])
-          setPromotions([])
-        }
       } catch (err) {
-        console.error('Error in useSanityData:', err)
-        setError('Error al conectar con Sanity CMS. Mostrando menú estático.')
-        setProducts([])
-        setPromotions([])
+        console.error('Error fetching data from Sanity:', err)
+        setError(err.message)
       } finally {
         setLoading(false)
       }

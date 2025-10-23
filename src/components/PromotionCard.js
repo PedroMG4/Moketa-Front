@@ -36,3 +36,4 @@ export default function PromotionCard({ promotion, onAddToCart }) {
     </article>
   )
 }
+

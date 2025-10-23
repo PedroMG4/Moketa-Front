@@ -42,3 +42,4 @@ El frontend está configurado para usar Sanity CMS para:
 - Contenido editable
 
 Los datos se cargan desde Sanity Studio y se muestran en el frontend.
+
