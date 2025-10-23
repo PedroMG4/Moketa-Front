@@ -5,7 +5,6 @@ import Link from 'next/link'
 import { useSanityData } from '../hooks/useSanityData'
 import ProductCard from '../components/ProductCard'
 import PromotionCard from '../components/PromotionCard'
-import styles from './page.module.css'
 
 export default function Home() {
   const [cart, setCart] = useState([])
@@ -157,13 +156,13 @@ export default function Home() {
   return (
     <>
 
-      <header className={styles.header}>
-        <div className={styles.wrap}>
-          <Link href="/" className={styles.brand}>
-            <div className={styles.name}>MOKETA</div>
-            <img className={styles.brand__img} src="/logo-moketa.png" alt="Logo MOKETA" />
+      <header>
+        <div className="wrap">
+          <Link href="/" className="brand">
+            <div className="name">MOKETA</div>
+            <img className="brand__img" src="/logo-moketa.png" alt="Logo MOKETA" />
           </Link>
-          <Link className={styles.cart} href="/carrito">
+          <Link className="cart" href="/carrito">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="9" cy="21" r="1"></circle>
               <circle cx="20" cy="21" r="1"></circle>
@@ -175,12 +174,12 @@ export default function Home() {
       </header>
 
       <main>
-        <div className={styles.container}>
+        <div className="container">
           {/* Loading state */}
           {sanityLoading && (
-            <section className={styles.category}>
-              <div className={styles.loadingState}>
-                <h2 className={styles.category__title}>Cargando menú...</h2>
+            <section className="category">
+              <div className="loading-state">
+                <h2 className="category__title">Cargando menú...</h2>
                 <p style={{ color: 'white', textAlign: 'center' }}>Cargando productos desde Sanity CMS...</p>
               </div>
             </section>
@@ -188,9 +187,9 @@ export default function Home() {
           
           {/* Error state */}
           {sanityError && (
-            <section className={styles.category}>
-              <div className={styles.errorState}>
-                <h2 className={styles.category__title}>Error al cargar menú</h2>
+            <section className="category">
+              <div className="error-state">
+                <h2 className="category__title">Error al cargar menú</h2>
                 <p style={{ color: 'white', textAlign: 'center' }}>
                   Error: {sanityError}
                 </p>
@@ -216,9 +215,9 @@ export default function Home() {
                 }
                 
                 return (
-                  <section key={category} className={styles.category}>
-                    <h2 className={styles.category__title}>{categoryTitles[category]}</h2>
-                    <div className={styles.grid}>
+                  <section key={category} className="category">
+                    <h2 className="category__title">{categoryTitles[category]}</h2>
+                    <div className="grid">
                       {categoryProducts.map(product => (
                         <ProductCard 
                           key={product._id}
@@ -233,9 +232,9 @@ export default function Home() {
               
               {/* Promociones desde Sanity */}
               {promotions.length > 0 && (
-                <section className={styles.category}>
-                  <h2 className={styles.category__title}>Promos</h2>
-                  <div className={styles.grid}>
+                <section className="category">
+                  <h2 className="category__title">Promos</h2>
+                  <div className="grid">
                     {promotions.map(promotion => (
                       <PromotionCard 
                         key={promotion._id}
@@ -251,9 +250,9 @@ export default function Home() {
 
           {/* Empty state */}
           {!sanityLoading && !sanityError && products.length === 0 && (
-            <section className={styles.category}>
-              <div className={styles.loadingState}>
-                <h2 className={styles.category__title}>No hay productos disponibles</h2>
+            <section className="category">
+              <div className="loading-state">
+                <h2 className="category__title">No hay productos disponibles</h2>
                 <p style={{ color: 'white', textAlign: 'center' }}>
                   Por favor, agrega productos desde Sanity Studio.
                 </p>
@@ -264,35 +263,35 @@ export default function Home() {
       </main>
 
       {/* Sección de redes sociales */}
-      <section className={styles.socialSection}>
-        <div className={styles.socialContainer}>
-          <h2 className={styles.socialTitle}>Síguenos</h2>
-          <div className={styles.socialButtons}>
-            <a href="https://www.instagram.com/moketaoficial/" className={styles.socialBtn} target="_blank" rel="noopener noreferrer">
+      <section className="social-section">
+        <div className="social-container">
+          <h2 className="social-title">Síguenos</h2>
+          <div className="social-buttons">
+            <a href="https://www.instagram.com/moketaoficial/" className="social-btn" target="_blank" rel="noopener noreferrer">
               <svg viewBox="0 0 24 24" fill="currentColor">
                 <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
               </svg>
               Instagram
             </a>
           </div>
-          <p className={styles.address}>📍 Avenida Paysandú 4265, Corrientes, Argentina</p>
+          <p className="address">📍 Avenida Paysandú 4265, Corrientes, Argentina</p>
         </div>
       </section>
 
-      <footer className={styles.footer}>
-        <div className={styles.footerCredits}>
+      <footer>
+        <div className="footer-credits">
           <div>© 2025 Moketa | Todos los derechos reservados</div>
-          <div className={styles.devby}>DevBy Pedro Garay</div>
+          <div className="devby">DevBy Pedro Garay</div>
         </div>
       </footer>
 
       {/* Modal de confirmación del carrito */}
       {showCartModal && (
-        <div className={styles.modal} onClick={closeModal}>
-          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
-            <span className={styles.close} onClick={closeModal}>&times;</span>
-            <div className={styles.modalBody}>
-              <div className={styles.modalIcon}>✅</div>
+        <div className="modal" onClick={closeModal}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <span className="close" onClick={closeModal}>&times;</span>
+            <div className="modal-body">
+              <div className="modal-icon">✅</div>
               <h3>¡Agregado al carrito!</h3>
               <p>{modalMessage}</p>
             </div>
@@ -302,18 +301,18 @@ export default function Home() {
 
       {/* Modal de selección de promoción */}
       {showPromoModal && currentPromo && (
-        <div className={styles.modal} onClick={closePromoModal}>
-          <div className={styles.promoModalContent} onClick={(e) => e.stopPropagation()}>
-            <span className={styles.close} onClick={closePromoModal}>&times;</span>
-            <div className={styles.modalBody}>
+        <div className="modal" onClick={closePromoModal}>
+          <div className="promo-modal-content" onClick={(e) => e.stopPropagation()}>
+            <span className="close" onClick={closePromoModal}>&times;</span>
+            <div className="modal-body">
               <h3>Selecciona {currentPromo.quantity} hamburguesa(s) {currentPromo.burgerType.toLowerCase()}(s)</h3>
               <p>Precio total: {currentPromo.price}</p>
               
-              <div className={styles.burgerGrid}>
+              <div className="burger-grid">
                 {availableBurgers[currentPromo.burgerType]?.map(burgerName => (
                   <div
                     key={burgerName}
-                    className={`${styles.burgerOption} ${selectedBurgers.includes(burgerName) ? styles.selected : ''}`}
+                    className={`burger-option ${selectedBurgers.includes(burgerName) ? 'selected' : ''}`}
                     onClick={() => selectBurger(burgerName)}
                   >
                     {burgerName}
@@ -322,7 +321,7 @@ export default function Home() {
               </div>
               
               {selectedBurgers.length > 0 && (
-                <div className={styles.selectedBurgers}>
+                <div className="selected-burgers">
                   <h4>Hamburguesas seleccionadas:</h4>
                   <ul>
                     {selectedBurgers.map((burger, index) => (
@@ -332,15 +331,15 @@ export default function Home() {
                 </div>
               )}
               
-              <div className={styles.modalActions}>
+              <div className="modal-actions">
                 <button 
-                  className={styles.btnConfirmPromo} 
+                  className="btn-confirm-promo" 
                   onClick={confirmPromoSelection}
                   disabled={selectedBurgers.length !== currentPromo.quantity}
                 >
                   Confirmar ({selectedBurgers.length}/{currentPromo.quantity})
                 </button>
-                <button className={styles.btnCancel} onClick={closePromoModal}>
+                <button className="btn-cancel" onClick={closePromoModal}>
                   Cancelar
                 </button>
               </div>
